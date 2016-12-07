@@ -1,0 +1,64 @@
+config chilli
+option disabled 1
+
+# Your HotSpotSystem account details
+option radiusnasid 		"nz003"
+option radiussecret		"i2HDsa123"
+option uamsecret		"eDnhCGehh48k"
+
+# WISPr settings
+# It is possible your provider has specific demands on these values. But for WISPr the values are
+# as shown below. (cc=2-digit ISO country; idd=phone-country;ac=phone-area-code)
+# example:			"isocc=se,cc=46,ac=584,network=CampingTiveden"
+# the <SSID> does not actually need to be the SSID, but WISPr RFC calls it SSID
+# the <sub-id> is just so you know which device on your network gave the problem. Can be Alfanumeric.
+
+option locationname 		"sz"
+#option radiuslocationname 	"<SSID>,<sub-ID>"
+#option radiuslocationid 	"isocc=<cc>,cc=<idd>,ac=<ac>,network=<SSID>"
+
+# Radius parameters (change to the one for your provider)
+option radiusserver1		cn.radius.yokena.com
+option radiusserver2		cn.radius.yokena.com
+
+# Your device's LAN interface on which to put the hotspot
+option dhcpif 			br-lan		# Subscriber Interface for client devices
+
+# set DNS to whatever is fastest. On slow saturated lines, best use your local router for caching.
+# on fast & wide lines, use or Google or your ISP's dns, whichever is fastest 
+option dns1			8.8.8.8
+option dns2			8.8.4.4
+	
+# Tunnel and Subnet 
+option tundev 			'tun0'
+option net			10.1.0.0/22	# For 1000 addresses. Default is 182/24 subnet
+option uamlisten		10.1.0.1	# keep it at 182.1 despite the 180/22 subnet
+#option lease			86400		# 1 day
+#option leaseplus		600		# plus 10 minutes
+
+# Universal access method (UAM) parameters
+option uamserver		"http://yanshia.gatecloud.com.cn"
+option uamport 			3990
+option uamuiport 		4990		# HotSpot UAM "UI" Port (on subscriber network)
+option uamanydns		1
+#option	uamaliasip 		1.0.0.1		# default: http://1.0.0.1 will goto login page
+option uamaliasname 		login		#          http://login will goto login page
+#option	uamlogoutip 		1.0.0.0		# default: http://1.0.0.0 will logout
+#						# default: http://logout will logout
+#option nouamsuccess		1		# no success page, to original requested URL
+
+# Hosts; services; network segments the client can access without first authenticating (walled garden)
+# Hosts are evaluated every 'interval', but this does not work well on multi-homed (multi-IP'ed) hosts, use IP instead.
+option uamallowed	"10.1.0.1,192.168.8.1,gatecloud.cn,gatecloud.com.cn,192.168.182.1"
+
+# Domain suffixes the client can access without first authenticating (walled garden)
+# Host on the domain are checked by spying on DNS requests, so this does work for multi-homed hosts too.
+#option uamdomain	".paypal.com,.paypalobjects.com,.worldpay.com,.rbsworldpay.com,.adyen.com,.hotspotsystem.com"
+
+# Various debug and optimization values
+#option swapoctets		1		# swap input and output octets
+#option interval 		3600		# config file and host lookup refresh
+
+# Add the chilli firewall rules
+option ipup '/etc/chilli/up.sh'
+option ipdown '/etc/chilli/down.sh'

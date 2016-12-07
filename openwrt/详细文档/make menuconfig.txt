@@ -1,0 +1,54 @@
+make menuconfig：
+  
+Target System (x86)
+Target Profile (Generic)
+[*]Build the OpenWrt ImageBuilder
+   --[*]Include package repositiories
+   
+Base system
+   --[*]qos-scripts//qos设置 产生/etc/config/qos文件
+   
+Kernel modules
+   --Netfilter Extensions
+       --[*]kmod-ipt-extra
+       --[*]kmod-ipt-filter
+       --[*]kmod-ipt-nat
+       --[*]kmod-ipt-nat6
+       --[*]kmod-ipt-ipsec
+       --[*]kmod-ipt-ipset
+       --[*]#可以全选ipt 来支持所有iptables命令
+   --Network Devices
+       --[*]kmod-e1000e//支持网口识别
+   --Network Support
+       --[*]kmod-8021q//支持虚拟vlan划分
+       --[*]kmod-sched//支持iptables 限速功能
+   --USB Support
+       --[*]kmod-usb-hid//支持usb设备
+
+Languages
+   --Lua
+       --[*]dkjson//json解析包
+       --[*]luarocks//lua包管理器
+       --[*]luasocket//用于socket操作
+
+LuCI
+   --Collections
+       --[*]luci
+   --Applications
+       --[*]luci-app-mwan3
+       --[*]luci-app-tinyproxy
+
+Network
+   --Captive Portals
+       --[*]coova-chilli
+   --Routing and Redirection
+       --[*]mwan3//多线多拨 负载均衡
+   --Web Servers/Proxies
+       --[*]dansguardian//关键字过滤
+       --[*]tinyproxy//小型proxy代理服务器 url过滤
+   --[*]ppp
+       --[*]ppp-mod-pppoe
+       --[*]ppp-mod-radius
+
+Utilities
+   --[*]openssl-util//openssl加密组件

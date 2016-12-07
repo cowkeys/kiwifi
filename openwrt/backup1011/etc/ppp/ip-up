@@ -1,0 +1,79 @@
+#!/bin/sh
+# parameters
+# $1 the interface name used by pppd (e.g. ppp3)
+# $2 the tty device name
+# $3 the tty device speed
+# $4 the local IP address for the interface
+# $5 the remote IP address
+# $6 the parameter specified by the 'ipparam' option to pppd
+
+
+echo "1 $1" > /etc/ppp/abclog
+echo "2 $2" >> /etc/ppp/abclog
+echo "3 $3" >> /etc/ppp/abclog
+echo "4 $4" >> /etc/ppp/abclog
+echo "5 $5" >> /etc/ppp/abclog
+echo "6 $6" >> /etc/ppp/abclog
+
+
+
+/usr/sbin/iptables -t nat -A POSTROUTING -o $1 -j MASQUERADE
+
+# Getting the RP-Upstream-Speed-Limit from radius (integer value)
+UPLOAD=$(cat /var/run/radattr.$1 | grep -i RP-Upstream-Speed-Limit | awk '{print $2}')
+#UPLOAD=8000
+echo "upload is ${UPLOAD}" >> /etc/ppp/abclog
+
+
+if [  -z "$UPLOAD" ]; then
+   UPLOAD=8000
+   echo "upload  ${UPLOAD}" >> /etc/ppp/abclog
+fi
+echo "upload issss ${UPLOAD}" >> /etc/ppp/abclog
+classid=`expr $UPLOAD / 100 + 1`
+
+
+
+/usr/sbin/tc class add dev eth0 parent 1:1 classid 1:${classid} htb rate ${UPLOAD}kbit ceil ${UPLOAD}kbit prio 1
+echo "/usr/sbin/tc class add dev eth0 parent 1:1 classid 1:${classid} htb rate ${UPLOAD}kbit ceil ${UPLOAD}kbit prio 1" >> /etc/ppp/abclog
+
+/usr/sbin/tc filter add dev eth0 parent 1:0 protocol ip prio 1 handle ${classid} fw classid 1:${classid}
+echo "/usr/sbin/tc filter add dev eth0 parent 1:0 protocol ip prio 1 handle ${classid} fw classid 1:${classid}" >> /etc/ppp/abclog
+
+/usr/sbin/iptables -t mangle -A POSTROUTING -s ${5}/32  -o eth0 -j MARK --set-xmark ${classid}
+echo "/usr/sbin/iptables -t mangle -A POSTROUTING -s ${5}/32  -o eth0 -j MARK --set-xmark ${classid}" >> /etc/ppp/abclog
+
+/usr/sbin/iptables -t mangle -A POSTROUTING -o eth0 -s $5  -j RETURN
+
+echo "/usr/sbin/iptables -t mangle -A POSTROUTING -o eth0 -s $5  -j RETURN" >> /etc/ppp/abclog
+
+
+# Getting the RP-Downstream-Speed-Limit from radius (integer value)
+DOWNLOAD=$(cat /var/run/radattr.$1 | grep -i RP-Downstream-Speed-Limit | awk '{print $2}')
+echo "$DOWNLOAD" >> /etc/ppp/abclog
+
+#DOWNLOAD=20000
+if [  -z "$DOWNLOAD" ]; then
+   DOWNLOAD=10000
+   
+fi
+
+dclassid=`expr $DOWNLOAD / 100 + 2`
+
+/usr/sbin/tc qdisc add dev $1 root handle 1: htb default 30
+
+/usr/sbin/tc class add dev $1 parent 1: classid 1:${dclassid} htb rate ${DOWNLOAD}kbit
+
+/usr/sbin/tc filter add dev $1 protocol ip parent 1:0 prio 1 u32 match ip dst $5/32 flowid 1:${dclassid}
+
+
+/usr/sbin/iptables -t filter -I FORWARD -o $1 -j ACCEPT
+/usr/sbin/iptables -t filter -I FORWARD -i $1 -j ACCEPT
+
+
+
+
+logfile=/var/log/ppp
+echo "`date` $0 $1 $2 $3 $4 $5 $6" >> $logfile
+
+exit 0

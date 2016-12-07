@@ -1,0 +1,57 @@
+﻿pppoe-server radius设置
+参考http://pank.org/blog/2006/09/pppoe-server-freeradius-mysql.html
+1\ opkg install ppp-mod-radius
+2\ copy /usr/lib/pppd/2.4.7里面的so文件到 /etc/ppp/plugins中
+3\ etc/ppp/radius 
+	# SERVER SECRET
+	13.76.240.54 i6hdsa57z2
+4\ et/ppp/radius.conf 修改
+	authserver 13.76.240.54:1812   //115.29.5.179
+	acctserver 13.76.240.54:1813
+5\ etc/ppp/options 添加
+	plugin /usr/lib/pppd/2.4.7/radius.so
+	radius-config-file /etc/ppp/radius.conf
+6\ radattr.so 的问题，在编译openwrt的时候 进入package network service 找到ppp的makefile 
+	在define Package/ppp-mod-radius/install
+下面修改成：
+$(INSTALL_DIR) $(1)/usr/lib/pppd/$(PKG_VERSION)
+	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/lib/pppd/$(PKG_VERSION)/radattr.so \
+		$(1)/usr/lib/pppd/$(PKG_VERSION)/
+	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/lib/pppd/$(PKG_VERSION)/radius.so \
+		$(1)/usr/lib/pppd/$(PKG_VERSION)/
+再编译文件，得到的ipk下面就有 radattr.so
+
+
+ 
+iptables -t nat -A POSTROUTING -s 10.0.0.0/24 -j MASQUERADE
+pppoe-server -k -T 60 -I br-lan -N 100 -C Myp -L 10.0.0.1 -R 10.0.0.2
+
+iptables -t nat -A POSTROUTING -s 192.168.8.0/24 -j MASQUERADE
+pppoe-server -k -T 60 -I br-lan -N 100 -C Myp -L 192.168.8.1 -R 192.168.8.101
+iptables -I FORWARD -i ppp+ -j ACCEPT
+iptables -I FORWARD -o ppp+ -j ACCEPT
+
+
+比如我们现在要将所有192.168.10.0网段的IP在经过的时候全都转换成172.16.100.1这个假设出来
+的外网地址：
+
+
+iptables -t nat -A POSTROUTING -s 192.168.10.0/24 -j SNAT --to-source 172.16.100.1
+
+
+这样，只要是来自本地网络的试图通过网卡访问网络的，都会被统统转换成172.16.100.1这个IP.
+
+
+那么，如果172.16.100.1不是固定的怎么办？
+
+我们都知道当我们使用联通或者电信上网的时候，
+一般它都会在每次你开机的时候随机生成一个外网的IP，意思就是外网地址是动态变换的。
+这时我们就要将外网地址换成 MASQUERADE(动态伪装):它可以实现自动寻找到外网地址，
+而自动将其改为正确的外网地址。所以，我们就需要这样设置：
+
+
+iptables -t nat -A POSTROUTING -s 192.168.10.0/24 -j MASQUERADE
+
+
+这里要注意：地址伪装并不适用于所有的地方。
+

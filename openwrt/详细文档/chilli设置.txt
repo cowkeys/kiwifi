@@ -1,0 +1,32 @@
+chilli设置
+1、chilli相关的文件
+	/etc/config/chilli
+	/etc/init.d/chilli
+
+2、配置/etc/config/chilli
+config chilli
+	# option disabled 1 //注释该句代表启用本配置
+	option radiusnasid 		"nz001"
+	option radiussecret		"i6hdsa57z2"
+	option uamsecret		"eDnhCGehh48k"
+	option locationname 		"sz"
+	option radiusserver1		cn.radius.yokena.com
+	option radiusserver2		cn.radius.yokena.com
+	option dhcpif 			br-lan		
+	option dns1			8.8.8.8
+	option dns2			8.8.4.4
+	option tundev 			'tun0'
+	option net			10.1.0.0/22	# For 1000 addresses. Default is 182/24 subnet
+	option uamlisten		10.1.0.1	# keep it at 182.1 despite the 180/22 subnet
+	option uamserver		"http://yanshia.gatecloud.com.cn"
+	option uamport 			3990
+	option uamuiport 		4990		# HotSpot UAM "UI" Port (on subscriber network)
+	option uamanydns		1
+	option uamaliasname 		login		#          http://login will goto login page
+	option uamallowed	"10.1.0.1,192.168.8.1,gatecloud.cn,gatecloud.com.cn,192.168.182.1"
+	option ipup '/etc/chilli/up.sh'
+	option ipdown '/etc/chilli/down.sh'
+
+3、启动
+	/etc/init.d/chilli enable
+	/etc/init.d/chilli start 

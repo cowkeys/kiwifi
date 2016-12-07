@@ -1,0 +1,32 @@
+pppoe-server设置：
+1、相关的文件介绍
+	/etc/init.d/pppoe-server         #启动文件
+	/etc/default/pppoe-server        #启动文件中引用的变量存储文件
+	/etc/default/poollan|poollan2... #对应端口的ip池文件
+	/etc/ppp/radius.conf 		 #可修改radius服务器地址
+	/etc/ppp/ip-up			 #每个账号拨通之后运行
+	/etc/ppp/ip-down		 #每个账号登出之后运行
+	/etc/ppp/radius/server		 #radius服务器地址和密码
+	/etc/ppp/radius/dictionary       #获取参数的字典
+
+2、配置和启动
+刷机后必须进行的配置：
+etc/ppp/radius/server
+	# SERVER SECRET
+	13.76.240.54 i6hdsa57z2
+etc/ppp/radius.conf 修改
+	authserver 13.76.240.54:1812   //115.29.5.179
+	acctserver 13.76.240.54:1813
+
+手动启动：
+iptables -t nat -A POSTROUTING -s 10.0.0.0/24 -j MASQUERADE		#将10.0.0.0网段转发到wan口出去
+pppoe-server -k -T 60 -I br-lan -N 100 -C Myp -L 10.0.0.1 -R 10.0.0.2   #pppoe启动语句 大机2-6网口分别为br-lan至br-lan5
+iptables -I FORWARD -i ppp+ -j ACCEPT 					#转发ppp
+iptables -I FORWARD -o ppp+ -j ACCEPT
+
+自动启动：
+经过远程获取网关信息后，/etc/default/pppoe-server 会写入配置信息
+然后直接输入命令/etc/init.d/pppoe start 启动 /etc/init.d/pppoe enable设置重启运行
+
+3、拨号
+连接pc，设置账号密码 进行拨号，如未成功，查看/var/pppoe.log日志

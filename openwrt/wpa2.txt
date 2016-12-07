@@ -1,0 +1,29 @@
+参考 http://awbsworld.de/archives/152
+注意radius服务器需要写ip地址
+
+
+	option key 'i6hdsa57z2'
+	option server '13.76.240.54'
+	option port '1812'
+	option auth_server '13.76.240.54'
+	option auth_port '1812'
+	option auth_secret 'i6hdsa57z2'
+	option acct_server '13.76.240.54'
+	option acct_port '1813'
+	option acct_secret 'i6hdsa57z2'
+	option nasid 'nas01'
+
+
+config wifi-iface
+	option device 'radio0'
+	option network 'lan'
+	option mode 'ap'
+	option ssid 'OpenWrt'
+	option encryption 'wpa2'
+	option auth_server '13.76.240.54'
+	option auth_port '1812'
+	option auth_secret 'i6hdsa57z2'
+	option acct_server '13.76.240.54'
+	option acct_port '1813'
+	option acct_secret 'i6hdsa57z2'
+	option nasid 'nz001'

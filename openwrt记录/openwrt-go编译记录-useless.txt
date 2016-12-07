@@ -1,0 +1,113 @@
+2016/8/15 
+start time 9:50am
+1 git clone https://github.com/GeertJohan/openwrt-go
+2 git checkout add-gccgo-and-libgo
+3 make menuconfig
+4 -> Advanced configuration options
+	-> Toolchain options
+	....
+	-> Select Build/Install gccgo
+	....
+	-> C library implementation
+	-> Use eglibc
+
+5 make V=s
+
+end failed! 
+
+2016/8/15
+start time 14:04 pm
+ubuntu
+mkdr op
+cd op
+1 sudo apt-get install build-essential asciidoc binutils bzip2 gawk gettext git subversion libssl-dev libncurses5-dev  patch unzip zlib1g-dev 
+
+2 git clone https://github.com/GeertJohan/openwrt-go
+
+3 git checkout add-gccgo-and-libgo
+
+4 ./scripts/feeds update -a
+
+5 ./scripts/feeds install -a
+
+6 make defconfig
+
+7 make menuconfig
+
+8 -> Advanced configuration options
+	-> Toolchain options
+	....
+	-> Select Build/Install gccgo
+	....
+	-> C library implementation
+	-> Use eglibc
+  ->kernel modules-> kmod-usb-hid(kernel modules->USB support)
+
+9 make download V=s  第一次运行 出现错误 donwload failed 可能是网络问题 第二次运行成功
+
+10 make V=99 
+	err: /home/rick/op/openwrt-go/include/toplevel.mk:181: recipe for target 'toolchain/**'failed
+	尝试：make toolchain/clean V=99 -j
+	      make V=99
+	再次出现同样的错误
+	尝试2：make toolchain/clean V=99 -j
+	       make toolchain/compile V=99 -j
+	err again
+
+	再次尝试 make dirclean
+	         ./scripts/feeds update -a
+		 ./scripts/feeds install -a
+		 修改make menuconfig
+		 make V=s
+	继续错误...
+
+
+
+2016/8/15
+start time 18:00 pm
+不知道是虚拟机的问题还是编译过程出错
+在DO上买了一个5刀的ubuntu14.04
+按照之前的方法
+安装build essenctial 和必要组件后
+重新安装一次
+1 sudo apt-get install build-essential asciidoc binutils bzip2 gawk gettext git subversion libssl-dev libncurses5-dev  patch unzip zlib1g-dev 
+
+2 git clone https://github.com/GeertJohan/openwrt-go
+
+3 git checkout add-gccgo-and-libgo
+
+4 ./scripts/feeds update -a
+
+5 ./scripts/feeds install -a
+
+6 make defconfig
+
+7 make menuconfig
+
+8 -> Advanced configuration options
+	-> Toolchain options
+	....
+	-> Select Build/Install gccgo
+	....
+	-> C library implementation
+	-> Use eglibc
+  ->kernel modules-> kmod-usb-hid(kernel modules->USB support)
+
+9 make V=s
+成功编译出来
+
+
+2016.08.16 11:00am
+之前准备的是 NW618路由器，但是感觉这个路由器比较小 ram 16mb flash 4mb,
+因为手上还有一个oye0001，所以重新编译一个
+- Target System  Ralink RT288x/RT3xxx
+- Subtarget  MT7620 based boards
+的系统
+
+正在编译中...
+
+
+后续
+openwrt-go的支持还不是很好，因为golang1.4后改变了gcc的编译方式，所以个人不推荐使用go运行在openwrt上，不过golang新版本1.7的说明貌似正在往小型机器上兼容。
+所以以后再看看吧。
+官方版本的openwrt其实够用了。

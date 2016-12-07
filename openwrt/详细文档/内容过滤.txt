@@ -1,0 +1,93 @@
+内容过滤 包括 tinyproxy 和 dansguardian 两个组件的使用
+
+一、tinyproxy的使用
+官方说明文档： https://wiki.openwrt.org/oldwiki/proxy.tinyproxy
+
+配置步骤：
+
+1、如果没有把tinyproxy编译到固件则需要下载安装
+	opkg update
+	opkg install tinyproxy
+
+2、相关配置文件
+	/etc/tinyproxy/filter 如果没有需要手动新建 过滤格式见：https://wiki.openwrt.org/oldwiki/proxy.tinyproxy
+	/etc/config/tinyproxy
+	/var/log/ 日志文件所处位置
+
+2、修改配置文件
+修改/etc/config/tinyproxy 取消注释并改变其中的某些option:
+	option enabled 1			#启用
+	option Port 3128			#监听端口
+	option Listen 192.168.8.1 		#监听网关
+	list Allow 127.0.0.1		
+	list Allow 192.168.8.0/24
+	option Filter "/etc/tinyproxy/filter"   #url过滤filter文件，如果目录没有需要新增
+	option FilterURLs 1
+	option FilterExtended 1
+	option FilterDefaultDeny 0 		#0代表filter文件作为黑名单，1代表filter文件作为白名单
+
+3、修改/etc/config/firewall
+添加一个redirect option 然后执行
+
+	/etc/init.d/firewall restart
+	config redirect
+    		option name 'Transparent Proxy Redirect'
+    		option src 'lan'
+    		option proto 'tcp'
+    		option dest_port '3128'
+    		option src_dport '80'
+    		option src_dip '!192.168.8.1'
+    		option dest_ip '192.168.8.1'
+4、运行tinyproxy
+	/etc/init.d/tinyproxy start
+
+若成功 访问带有 filter文件中关键字的url地址 就会有tinyproxy的限制界面出现
+
+----------------------
+二、dansguardian的使用
+dansguardian作为内容过滤器使用，(dans依赖一个proxy服务器，我们使用tinyproxy)
+下面简单以内容关键字过滤为例
+配置步骤：
+
+1、如果没有把tinyproxy编译到固件则需要下载安装
+	opkg update
+	opkg install dansguardian
+
+2、修改配置文件
+
+        <1> 打开 /etc/config/dansguardian 添加或修改以下option：
+	option bannedphraselist '/etc/dansguardian/lists/bannedphraselist' #默认没有这个banlist 需要新增这一句
+	option filterports '8888'			#监听端口
+	option proxyip '192.168.8.1'    		#监听网关
+	option proxyport '3128'			        #proxy服务器的端口,和tinyproxy服务器端口一致
+	option loglocation '/var/log/dans.log'		#日志路径
+
+	<2> 打开 /etc/init.d/dansguardian 添加以下内容，这是启动shell文件，需要添加bannedphraselist
+	    有三处地方需要添加 (不要括号[])
+
+	1. ['bannedphraselist:string' \]
+	2. local config_file accessdeniedaddress bannediplist [bannedphraselist]
+	3. [echo "bannedphraselist = " $bannedphraselist >> $CONFIGFILE]
+	3.修改bannedphraselist
+		/etc/dansguardian/lists/bannedphraselist 中按例子加入关键字
+		<example>
+
+        <3> 修改/etc/config/firewall 
+	    修改在设置tinyproxy的时候新增的redirect中 option dest_port 为dansguardian 8888
+
+	    config redirect
+ 		option name 'Transparent Proxy Redirect'
+ 		option src 'lan'
+ 		option proto 'tcp'
+ 		option dest_port '8888'
+ 		option src_dport '80'
+ 		option src_dip '!192.168.8.1'
+ 		option dest_ip '192.168.8.1'
+	
+	    重启firewall
+	        /etc/init.d/firewall restart
+
+3、运行dansguardian
+	/etc/init.d/dansguardian start
+
+	这样 访问 带有example 关键字的网页就会跳转到dansguardian的限制页面

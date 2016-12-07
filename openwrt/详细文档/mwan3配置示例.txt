@@ -1,0 +1,81 @@
+mwan3官方说明https://wiki.openwrt.org/doc/howto/mwan3
+
+mwan3配置示例
+
+1、相关文件
+	/etc/config/network
+	/etc/config/firewall
+	/etc/config/mwan3
+	/etc/init.d/mwan3
+------------------------------------------------------
+2、配置
+    1、添加一个新的wan2 配置和wan相同,如果不用luci界面添加，需要手动修改下面两个文件
+	/etc/config/network
+	    config interface 'wan2'
+		option proto 'dhcp'
+		option ifname 'eth1'
+
+	/etc/config/firewall
+	    config zone
+		option name 'wan'
+		option mtu_fix '1'
+		option input 'REJECT'
+		option forward 'REJECT'
+		option masq '1'
+		option output 'ACCEPT'
+		option network 'wan wan6 wan2'
+
+    2、修改/etc/config/mwan3
+	
+config interface 'wan'
+     option enabled '1'
+     list track_ip '8.8.4.4'
+     list track_ip '8.8.8.8'
+     list track_ip '208.67.222.222'
+     list track_ip '208.67.220.220'
+     option reliability '2'
+     option count '1'
+     option timeout '2'
+     option interval '5'
+     option down '3'
+     option up '8'
+
+config interface 'wan2'
+     option enabled '1'
+     list track_ip '8.8.8.8'
+     list track_ip '208.67.220.220'
+     option reliability '1'
+     option count '1'
+     option timeout '2'
+     option interval '5'
+     option down '3'
+     option up '8'
+
+config member 'wan_m1_w1'
+     option interface 'wan'
+     option metric '1'
+     option weight '1'
+     config member 'wan2_m1_w1'
+     option interface 'wan2'
+     option metric '1'
+     option weight '1'
+
+config policy 'wan_only'
+     list use_member 'wan_m1_w1'
+
+config policy 'wan2_only'
+     list use_member 'wan2_m1_w1'
+
+config policy 'balanced'
+     list use_member 'wan_m1_w1'
+     list use_member 'wan2_m1_w1'
+
+config rule 'default_rule'
+     option dest_ip '0.0.0.0/0'
+     option use_policy 'balanced'
+----------------------------------------------------------
+3、启动
+	/etc/init.d/mwan3 start
+	/etc/init.d/mwan3 enable
+
+	可输入mwan3 status查看实时动态

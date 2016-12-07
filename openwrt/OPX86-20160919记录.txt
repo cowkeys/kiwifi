@@ -1,0 +1,37 @@
+imgbuilder编译命令：
+1、make info 查看PROFILE型号
+2、make image PROFILE=Generic PACKAGES="luci dkjson luarocks luasec luasocket unzip coova-chilli openssl-util kmod-usb-hid kmod-e1000e  kmod-sched rp-pppoe-server ppp-mod-radius ppp wpad qos-scripts  -wpad-mini" FILES=files/
+   注：PACKAGES="" 带-是删除包 FILES 是要替换的文件目录 eg: 做一个目录 etc/config/network放到files文件夹里面
+
+make image PROFILE=Generic PACKAGES="rp-pppoe-server" FILES=files/
+
+第一次启动:
+crontab /root/yokenacron
+/etc/init.d/cron start
+/etc/init.d/cron enable
+
+开启 chilli 
+1、/etc/config/chilli 注释掉disable=1
+2、/etc/init.d/chilli start
+3、拔插网线
+
+开启rp-pppoe
+输入命令：
+iptables -t nat -A POSTROUTING -s 192.168.8.0/24 -j MASQUERADE
+pppoe-server -k -T 60 -I br-lan -N 100 -C Myp -L 192.168.8.1 -R 192.168.8.101
+iptables -I FORWARD -i ppp0 -j ACCEPT
+iptables -I FORWARD -o ppp0 -j ACCEPT
+
+或者修改 /etc/init.d/pppoe-server：
+start() {
+	[ -f $DEFAULT ] && . $DEFAULT
+	iptables -t nat -A POSTROUTING -s 192.168.8.0/24 -j MASQUERADE
+	pppoe-server -k -T 60 -I br-lan -N 100 -C Myp -L 192.168.8.1 -R 192.168.8.101
+	iptables -I FORWARD -i ppp0 -j ACCEPT
+	iptables -I FORWARD -o ppp0 -j ACCEPT
+}
+然后/etc/init.d/pppoe-server start
+
+
+   
+

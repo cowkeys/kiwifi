@@ -1,0 +1,15 @@
+
+config setting 'sets'
+	option client_id '10000010'
+	option client_secret 'a84ff88f6f230a1e4ba4f8e7a1868995'
+	option gateway_id '107'
+	option crypt_key 'A3UrSiLX'
+	option ippool '0'
+	option isont '1'
+	option ontusername 'nfc@nfc.co.nz'
+	option ontpassword 'nfc'
+
+config setting 'oauth'
+	option token 'Bearer 573870034847e06be616551f748dfb4c610cad50'
+	option expire_time '1476153444'
+

@@ -1,0 +1,17 @@
+1 ppp2
+2 br-lan
+3 0
+4 192.168.8.1
+5 192.168.8.8
+6 
+upload is 
+upload  8000
+upload issss 8000
+/usr/sbin/tc class add dev eth0 parent 1:1 classid 1:81 htb rate 8000kbit ceil 8000kbit prio 1
+/usr/sbin/tc filter add dev eth0 parent 1:0 protocol ip prio 1 handle 81 fw classid 1:81
+/usr/sbin/iptables -t mangle -A POSTROUTING -s 192.168.8.8/32  -o eth0 -j MARK --set-xmark 81
+/usr/sbin/iptables -t mangle -A POSTROUTING -o eth0 -s 192.168.8.8  -j RETURN
+
+upload down 8000
+/usr/sbin/iptables -t mangle -D POSTROUTING -s 192.168.8.8/32  -o eth0 -j MARK --set-xmark 81
+/usr/sbin/iptables -t mangle -D POSTROUTING -o eth0 -s 192.168.8.8  -j RETURN

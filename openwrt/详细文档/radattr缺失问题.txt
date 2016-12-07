@@ -1,0 +1,8 @@
+在编译openwrt的时候 进入package network service ppp 下找到makefile
+
+在215行的 define Package/ppp-mod-radius/install下面修改成：
+$(INSTALL_DIR) $(1)/usr/lib/pppd/$(PKG_VERSION)
+$(INSTALL_BIN) $(PKG_INSTALL_DIR)/lib/pppd/$(PKG_VERSION)/radattr.so \
+$(1)/usr/lib/pppd/$(PKG_VERSION)/
+
+再编译文件，得到的ipk就有 radattr.so

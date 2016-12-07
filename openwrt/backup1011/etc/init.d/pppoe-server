@@ -1,0 +1,27 @@
+#!/bin/sh /etc/rc.common
+# Copyright (C) 2006-2011 OpenWrt.org
+
+START=90
+
+DEFAULT=/etc/default/pppoe-server
+
+start() {
+	[ -f $DEFAULT ] && . $DEFAULT
+	/usr/sbin/tc qdisc del dev eth0 root 2>/dev/null
+	/usr/sbin/tc qdisc add dev eth0 root handle 1:0 htb default 123
+	/usr/sbin/tc class add dev eth0 parent 1:0 classid 1:1 htb rate 100Mbit ceil 100Mbit prio 0
+	
+	$pppoeoptslan
+	$pppoeoptslan2
+	$pppoeoptslan3
+	$pppoeoptslan4
+	$pppoeoptslan5
+	
+
+
+}
+
+stop() {
+	service_stop /usr/sbin/pppoe-server
+}
+

@@ -1,0 +1,48 @@
+openwrt 编译安装x86笔记
+
+一、编译 
+时间：2016.08.10
+https://dev.openwrt.org/wiki/GetSource
+参考：1、http://www.right.com.cn/forum/thread-176017-1-1.html
+      2、配置界面介绍：http://www.openwrt.org.cn/bbs/thread-14834-1-1.html
+      3、官网https://wiki.openwrt.org/zh-cn/doc/howto/buildroot.exigence	
+系统环境：Ubuntu 16.04
+wopenwrt源：git clone git://git.openwrt.org/15.05/openwrt.git 
+配置环境：$ sudo apt-get install build-essential asciidoc binutils bzip2 gawk gettext git subversion libssl-dev libncurses5-dev  patch unzip zlib1g-dev
+
+	  如果是64位系统的话还需要安装32位兼容包
+	  $ sudo apt-get install libc6:i386 libgcc1:i386 libstdc++5:i386 libstdc++6:i386
+步骤：	1、git clone git://git.openwrt.org/15.05/openwrt.git 
+	2、cd openwrt
+	3、./scripts/feeds update -a
+	4、./scripts/feeds install -a
+	5、make defconfig
+	6、make menuconfig 配置界面
+		1、选择target system
+		2、选择target profile
+		3、选择LUCI-collections-LUCI
+		4、如果是usb键盘 选择 kmod-usb-hid(kernel modules->USB support)
+		5、其他选项
+			kernel modules--network devices--kmod-e1000e 
+	7、make download V=s  
+	8、（第一次编译）make V=99  完成编译 结束。
+	   （非第一次）  ulimit -s 10240 
+			 make V=99 -j线程数  (ex:make V=99 -j2)完成编译 结束。
+	9、生成的文件在bin/系列名/ 下面 
+
+二、安装到X86机器
+时间：2016.08.10
+参考：http://blog.ich8.com/post/4499
+工具：winimage
+img镜像： 编译生成的openwrt-x86-generic-combined-ext4.img 
+系统环境：Ubuntu 16.04
+步骤：	1、把img转换为vmdk：1、sudo apt-get install qemu-utils
+			    2、qemu-img convert -f raw -O vmdk openwrt-x86-generic-combined-ext4.img  ****.vmdk
+	2、把vmdk和winimage放入pe，然后进入PE把vmdk通过winimage 写进机器硬盘，然后重启X86自动安装。
+	3、最后需要按回车 会显示文字图形界面 结束
+
+三、错误日志
+1、recipe for target 'world' failed
+	solution: make dirclean
+
+	

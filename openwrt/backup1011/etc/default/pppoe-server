@@ -1,0 +1,9 @@
+
+iptableoptslan2="iptables -t nat -A POSTROUTING -s 192.168.123.0/24 -j MASQUERADE"
+pppoeoptslan2="pppoe-server -k -T 60 -I br-lan2 -N 200 -C Myp -L 192.168.123.1 -R 192.168.123.2"
+iptableoptslan="iptables -t nat -A POSTROUTING -s 192.168.8.0/24 -j MASQUERADE"
+pppoeoptslan="pppoe-server -k -T 60 -I br-lan -N 200 -C Myp -L 192.168.8.1 -R 192.168.8.2"
+iptableoptslan3="iptables -t nat -A POSTROUTING -s 192.168.175.0/24 -j MASQUERADE"
+pppoeoptslan3="pppoe-server -k -T 60 -I br-lan3 -N 200 -C Myp -L 192.168.175.1 -R 192.168.175.2"
+iptableoptslan4="iptables -t nat -A POSTROUTING -s 192.168.225.0/24 -j MASQUERADE"
+pppoeoptslan4="pppoe-server -k -T 60 -I br-lan4 -N 200 -C Myp -L 192.168.225.1 -R 192.168.225.2"

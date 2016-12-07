@@ -1,0 +1,9 @@
+进入openwrt\bin\x86\OpenWrt-ImageBuilder-x86-generic.Linux-i686 目录
+如果有修改过的ipk 如ppp,ppp-radius等 放入目录/packages/base中 如果有低版本的ipk 如rp-pppoe，放入目录/packages/packages中
+
+imgbuilder编译命令：
+1、make info 查看PROFILE型号
+2、make image PROFILE=Generic PACKAGES="luci dkjson luarocks luasec luasocket unzip coova-chilli openssl-util kmod-usb-hid kmod-e1000e  kmod-sched rp-pppoe-server ppp-mod-radius ppp wpad qos-scripts tinyproxy luci-app-tinyproxy dansguardian mwan3 -wpad-mini" FILES=files/
+3、编译后的固件会在bin/x86下
+注： make image PROFILE=Generic PACKAGES="rp-pppoe-server" FILES=files/
+     PACKAGES="" 带-是删除包 FILES 是要替换的文件目录 

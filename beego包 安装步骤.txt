@@ -1,0 +1,35 @@
+﻿1、go get gopkg.in/olebedev/go-duktape.v2
+	https://gopkg.in/olebedev/go-duktape.v2
+ 	windows 需要安装gcc ：64位：http://tenet.dl.sourceforge.net/project/mingw-w64/Toolchains%20targetting%20Win32/Personal%20Builds/mingw-builds/installer/mingw-w64-install.exe
+		   	  32位：http://liquidtelecom.dl.sourceforge.net/project/mingw/Installer/mingw-get-setup.exe
+
+2、go get github.com/kib357/less-go
+	https://github.com/kib357/less-go
+
+
+3、go get -u github.com/disintegration/imaging
+	https://github.com/disintegration/imaging
+
+4、import github.com/bitly/go-simplejson
+	https://github.com/bitly/go-simplejson
+
+5、go get github.com/beego/i18n
+
+6、go get github.com/odeke-em/qrcode 
+	已经放入vendor 
+	https://github.com/odeke-em/qrcode
+
+7、go get golang.org/x/oauth2
+	已经放入vendor 
+	https://github.com/golang/oauth2
+
+8、go get github.com/astaxie/beego/validation
+
+
+
+
+改变的js
+
+js/policy/priority-index.js  line269 
+	eventHandler.createQos($(this), $('#H_CustomForm').serialize(), $custom);
+

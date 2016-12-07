@@ -1,0 +1,6 @@
+如何替换IPK中的文件  以修改ppp-mod-radius_2.4.7-6_x86.ipk 中dictionary文件为例
+
+1 自定义dictionary文件
+2 用7zip工具打开ipk
+3 直接放进相应目录
+4 ipk安装之后 dictionary就是修改后的文件了
